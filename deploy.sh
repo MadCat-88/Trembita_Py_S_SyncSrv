@@ -3,8 +3,8 @@
 set -e
 
 # Змінні для конфігурації
-REPO_URL="https://github.com/kshypachov/soap_sync_service.git"
-PROJECT_DIR="soap_sync_service"
+REPO_URL="https://github.com/MadCat-88/Trembita_Py_S_SyncSrv.git"
+PROJECT_DIR="Trembita_Py_S_SyncSrv"
 VENV_DIR="venv"
 DB_USER="your_db_user"
 DB_PASSWORD="your_db_password"
