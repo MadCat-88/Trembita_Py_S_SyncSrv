@@ -17,6 +17,17 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from contextlib import contextmanager
 
+# Цей вебсервіс є частиною навчальних матеріалів для розробників системи "Трембіта".
+# Вебсервіс, як приклад, логує всі HTTP-заголовки, які отримує з запитами.
+# У промисловому сервісі слід передбачити логування службових заголовків системи "Трембіта".
+# Перелік службових заголовків системи "Трембіта":
+# Uxp-Clien
+# Uxp-Service
+# Uxp-Queryid
+# Uxp-Userid
+# Uxp-Purpose-Ids
+# Uxp-Subject-Id
+
 try:
 
     # Завантаження конфігурації
