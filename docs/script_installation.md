@@ -24,7 +24,7 @@ sudo add-apt-repository ppa:deadsnakes/ppa
 
 2. Завантажити скрипт:
 ```bash
-wget https://raw.githubusercontent.com/kshypachov/soap_sync_service/master/deploy_by_gunicorn.sh
+wget https://raw.githubusercontent.com/MadCat-88/Trembita_Py_S_SyncSrv/master/deploy_by_gunicorn.sh
 ```
 
 3. Відредагувати скрипт «deploy_by_gunicorn.sh», замінивши значення параметрів `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_HOST` та `DB_PORT` на ваші реальні дані, де:
@@ -56,7 +56,7 @@ sudo add-apt-repository ppa:deadsnakes/ppa
 ```
 2. Завантажити скрипт:
 ```bash
-wget https://raw.githubusercontent.com/kshypachov/soap_sync_service/master/deploy.sh
+wget https://raw.githubusercontent.com/MadCat-88/Trembita_Py_S_SyncSrv/master/deploy.sh
 ```
 
 3. Відредагувати скрипт «deploy_by_gunicorn.sh», замінивши значення параметрів `DB_USER`, `DB_PASSWORD`, `DB_NAME`, `DB_HOST` та `DB_PORT` на ваші реальні дані, де:
