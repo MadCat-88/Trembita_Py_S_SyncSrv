@@ -175,7 +175,7 @@ journalctl -u soap_sync_service -f
 - [оновлення існуючого запису за кодом УНЗР](./docs/using.md#edit-person);
 - [видалення існуючого запису за кодом УНЗР](./docs/using.md#delete-person-by-unzr).
 
-Після встановлення вебсервісу його база даних порожня. Для демонстрації можливостей вебсервісу першим кроком необхідно створити нові записи в БД. Це можна зробити відповідним [вебклієнтом](https://github.com/MadCat-88/soap_client_trembita_sync) з використанням методу [Create Person](./docs/using.md#create-person), або за допомогою [скрипта наповнення бази даних](https://github.com/MadCat-88/PutFakeDataSOAP). 
+Після встановлення вебсервісу його база даних порожня. Для демонстрації можливостей вебсервісу першим кроком необхідно створити нові записи в БД. Це можна зробити відповідним [вебклієнтом](https://github.com/MadCat-88/soap_client_trembita_sync) з використанням методу [Create Person](./docs/using.md#create-person), або за допомогою [скрипта наповнення бази даних](https://github.com/MadCat-88/Trembita_PutFakeData_SOAP). 
 
 ## Внесок
 
