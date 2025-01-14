@@ -105,7 +105,7 @@ git clone https://github.com/MadCat-88/Trembita_Py_S_SyncSrv.git
 ### 9. Перейти до директорії з вебсервісом:
 
 ```bash
-cd soap_sync_service
+cd Trembita_Py_S_SyncSrv
 ```
 
 ### 10. Виконати конфігурацію вебсервісу згідно [настанов з конфігурації](./configuration.md).
