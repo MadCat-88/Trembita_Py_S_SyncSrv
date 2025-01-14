@@ -7,8 +7,8 @@ GREEN="\033[32m"
 RESET="\033[0m"
 
 # Змінні для конфігурації
-REPO_URL="https://github.com/kshypachov/soap_sync_service.git"
-PROJECT_DIR="soap_sync_service"
+REPO_URL="https://github.com.MadCat-88/Trembita_Py_S_SyncSrv.git"
+PROJECT_DIR="Trembita_Py_S_SyncSrv"
 VENV_DIR="venv"
 DB_USER="your_db_user"
 DB_PASSWORD="your_db_password"
@@ -44,7 +44,7 @@ sudo apt install -y "${packages[@]}"
 
 # Налаштування репозиторію MariaDB
 echo -e "${GREEN}Налаштування репозиторію MariaDB...${RESET}"
-curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
+curl -LsS https://r.mariadb.com/downloads/mariadb_repo_setup | sudo bash
 
 # Встановлення MariaDB сервера
 echo -e "${GREEN}Встановлення MariaDB сервера...${RESET}"
