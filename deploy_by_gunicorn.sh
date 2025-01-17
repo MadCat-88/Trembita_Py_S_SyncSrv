@@ -7,7 +7,7 @@ GREEN="\033[32m"
 RESET="\033[0m"
 
 # Змінні для конфігурації
-REPO_URL="https://github.com.MadCat-88/Trembita_Py_S_SyncSrv.git"
+REPO_URL="https://github.com/MadCat-88/Trembita_Py_S_SyncSrv.git"
 PROJECT_DIR="Trembita_Py_S_SyncSrv"
 VENV_DIR="venv"
 DB_USER="your_db_user"
