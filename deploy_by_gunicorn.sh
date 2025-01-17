@@ -15,7 +15,7 @@ DB_PASSWORD="your_db_password"
 DB_NAME="soap_service_db"
 DB_HOST="127.0.0.1"
 DB_PORT="3306"
-SERVICE_NAME="soap_sync_service_guvicorn"
+SERVICE_NAME="soap_sync_service"
 #APP_MODULE="main:app"  # Вкажіть правильний модуль додатку
 
 # Використовуємо Python 3.10 тільки !!!
