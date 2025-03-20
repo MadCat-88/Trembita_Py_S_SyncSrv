@@ -1,169 +1,170 @@
-# Посібник з встановлення сервісу вручну
+# Розгортання вебсрвісу в Docker
 
-## Опис 
-Цей посібник допоможе пройти процесс встановлення сервісу вручну. Для почтаку потрібно мати чисту систему Ubuntu, 
-всі необхідні пакети та репозиторії будуть підключені пізніше.
+## Вимоги
 
-## Загальні вимоги
+| ПЗ             |   Версія   | Примітка                     |
+|:---------------|:----------:|------------------------------|
+| MariaDB        | **10.5+**  |                              |
+| Docker         | **20.10+** |                              |
+| Docker Compose |   10.5+    | Якщо планується використання |
+| Git            |            | Для клонування репозиторію   |
 
-- Python 3.10 !!!
-- MariaDB 11+
-- Ubuntu Server 20.04+
-- Git
+## Змінні оточення
 
-## Встановлення сервісу
+Вебсервіс підтримує конфігурацію через змінні оточення. 
 
-### 1. Встановлення залежностей
-Для початку потрібно встановити всі необхідні пакети. Виконайте наступні команди для встановлення Python 3.10 
-і супутніх інструментів:
+Нижче наведено основні параметри
 
-```bash
-sudo apt-get update
-sudo apt upgrade -y
-sudo apt install -y curl libmariadb-dev gcc python3.10 python3.10-venv python3.10-dev git pkg-config
-```
-- Примітка: Якщо версія Python вище 3.10, сервіс працювати не буде. Інші пакети необхідні для коректної роботи з базою даних та репозиторієм.
+- `USE_ENV_CONFIG`: Керує використанням змінних оточення для конфігурації. Якщо встановлено значення `true`, вебсервіс використовує змінні оточення замість конфігураційного файлу.
+- `DB_USER`: Ім'я користувача бази даних.
+- `DB_PASSWORD`: Пароль для підключення до бази даних.
+- `DB_HOST`: Адреса хоста бази даних.
+- `DB_NAME`: Ім'я бази даних.
+- `DB_TYPE`: Тип бази даних. (Зараз підтримується тільки тип `mysql`)
+- `DB_PORT`: Порт бази даних. (За замовченням `3306` для `mysql`)
+- `LOG_FILENAME`: Ім'я файлу для логування. Якщо значення порожнє, логи будуть виводитися в консоль (stdout).
+- `LOG_LEVEL`: Рівень деталізації повідомлень у логах. Можливі значення: DEBUG (найдетальніший), INFO, WARNING, ERROR, CRITICAL. Значення DEBUG виводить максимальну кількість інформації для налагодження програми.
+- `LOG_FILEMODE`: Режим роботи з логами (наприклад, `a` — додавання до існуючого файлу або `w` — перезапис).
+- `SERVICE_HOST_INTERFACE`: Адреса інтерфейсу для роботи з сервісом. (За замовченням `0.0.0.0`) 
+- `SERVICE_PORT_INTERFACE`: Порт на якому працює сервіс. (За замовченням `8000`)
 
-### 2. Налаштуйте репозиторій MariaDB та встановіть СУБД MariaDB:
-```bash
-curl -sS https://downloads.mariadb.com/MariaDB/mariadb_repo_setup | sudo bash
-sudo apt install -y mariadb-server
-sudo apt install -y libmysqlclient-dev
-sudo apt install -y libmariadb-dev
-```
+## Збір Docker-образу
 
-### 3. Запустіть СУБД MariaDB та налаштуйте атозапуск:
-```bash
-sudo systemctl start mariadb
-sudo systemctl enable mariadb
-```
+Для того, щоб зібрати Docker-образ, необхідно:
 
-### 4. Створіть базу даних та користувача:
-```bash
-sudo mysql -e "CREATE DATABASE IF NOT EXISTS [DB_NAME] CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-sudo mysql -e "CREATE USER IF NOT EXISTS '[DB_USER]'@'%' IDENTIFIED BY '[DB_PASSWORD]';"
-sudo mysql -e "GRANT ALL PRIVILEGES ON [DB_NAME].* TO '[DB_USER]'@'%';"
-sudo mysql -e "FLUSH PRIVILEGES;"
-```
+1. Клонувати репозиторій:
 
-### 5. Клонуйте репозиторій:
 ```bash
 git clone https://github.com/kshypachov/soap_sync_service.git
 ```
 
-### 6. Перейдіть в папку з проектом:
+2. Перейти до директорії з вебсервісом:
 ```bash
 cd soap_sync_service
 ```
 
-### 7. Відредагуйте конфігураційні файли `alembic.ini` та `config.ini` додавши відомості про створену БД та користувача БД. 
+3. Виконати наступну команду в кореневій директорії проєкту:
 
-- У файлі alembic.ini відредагуйте рядок:
-  ```ini
-  sqlalchemy.url = mariadb+mariadbconnector://user:pass@localhost/dbname
-  ```
+```bash
+sudo docker build -t my-soap-app .
+```
 
-- У файлі `config.ini` відредагуйте секцію `[database]`:
-  ```ini
-  type = mysql
-  host = your_db_host
-  port = your_db_port
-  name = your_db_name
-  username = your_db_user
-  password = your_db_password
-  ```
+Ця команда створить Docker-образ з іменем `my-soap-app`, використовуючи Dockerfile, який знаходиться в поточній директорії.
+
+## Створення бази даних для сервісу
+Хоча контейнер і має у своєму складі компонент alembic котрий може створювати структуру бази даних, але його запуск з контейнера не є зручним.
+Саме тому пропонується створити базу даних та її структуру вручну.
+
+Для створення бази даних та її структури необхідно:
+1. Встановити СУБД MariaDB згідно настанов пунктів 3-6 [настанов з ручного встановлення вебсервісу](manual_installation.md#3-додати-репозиторій-mariadb).
+
+2. Створити базу даних та користувача настанов пункту 7 [настанов з ручного встановлення вебсервісу](manual_installation.md#7-створити-базу-даних-та-користувача-для-цього-необхідно).
+
+3. Створити структуру таблиці за допомогою виконання наступної команди:
+
+```bash
+sudo mysql -e "USE [DB_NAME]; CREATE TABLE IF NOT EXISTS \`person\` (
+  \`id\` int(11) NOT NULL AUTO_INCREMENT,
+  \`name\` varchar(128) DEFAULT NULL,
+  \`surname\` varchar(128) DEFAULT NULL,
+  \`patronym\` varchar(128) DEFAULT NULL,
+  \`dateOfBirth\` date DEFAULT NULL,
+  \`gender\` enum('male','female') DEFAULT NULL,
+  \`rnokpp\` varchar(10) DEFAULT NULL,
+  \`passportNumber\` varchar(9) DEFAULT NULL,
+  \`unzr\` varchar(14) DEFAULT NULL,
+  PRIMARY KEY (\`id\`),
+  UNIQUE KEY \`unzr\` (\`unzr\`),
+  UNIQUE KEY \`passportNumber\` (\`passportNumber\`),
+  UNIQUE KEY \`rnokpp\` (\`rnokpp\`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;"
+```
+де: `your_db_name` – назва БД, яка створена на попередньому кроці. 
+
+## Запуск та використання контейнера зі змінними оточення
+
+Щоб запустити контейнер з вебсервісом, необхідно виконати наступну команду:
+
+```bash
+sudo docker run -it --rm -p 8000:8000 \
+    -e USE_ENV_CONFIG=true \
+    -e DB_USER=myuser \
+    -e DB_PASSWORD=mypassword \
+    -e DB_HOST=mydbhost \
+    -e DB_NAME=mydatabase \
+    -e DB_TYPE=mysql \
+    -e DB_PORT=3306 \
+    -e LOG_LEVEL=info \
+    -e LOG_FILENAME="" \
+    my-soap-app
+```
+де:
+
+- параметр `-p 8000:8000` перенаправляє порт 8000 на локальній машині на порт 8000 всередині контейнера.
+
+- `DB_USER`: Ім'я користувача бази даних.
+
+- `DB_PASSWORD`: Пароль для підключення до бази даних.
+
+- `DB_HOST`: Адреса хоста бази даних.
+
+- `DB_NAME`: Назва бази даних.
+
+- Змінна `LOG_FILENAME=""` задає виведення логів у консоль (stdout).
+
+**Примітка:** У випадку розташування бази даних на одному хості з вебсервісом в значенні параметру `DB_HOST` необхідно вказувати IP-адресу хоста, значення `localhost` або `127.0.0.1` працювати не будуть. Окрім цього необхідно налаштувати зовнішні підключення до бази даних
+
+Якщо планується повністю використовувати змінні оточення для конфігурації, необхідно переконатись, що `USE_ENV_CONFIG=true`. 
 
 
-### Опис параметрів конфігураційного файлу
+### 3.6. Запуск та використання контейнера з конфігураційним файлом
 
-- **[database]**
-  - `type`: Тип бази даних, який використовується (наприклад, mysql, postgres).
-  - `host`: Хост, на якому знаходиться база даних.
-  - `port`: Порт для підключення до бази даних.
-  - `name`: Назва бази даних.
-  - `username`: Ім'я користувача для підключення до бази даних.
-  - `password`: Пароль користувача для підключення до бази даних.
+Контейнер з вебсервісом можна запустити використовуючи конфігураційний файл замість змінних оточення. 
+Для цього необхідно створити файл `config.ini` в директорії додатка та вказати шлях до нього:
 
-- **[logging]**
-  - `filename`: Шлях до файлу, в який будуть записуватися логи.
-  - `filemode`: Режим роботи з файлом логів (`a` - додавання до існуючого файлу, `w` - перезапис існуючого файлу).
-  - `format`: Формат запису логів. (https://docs.python.org/3/library/logging.html#logrecord-attributes)
-  - `dateformat`: Формат дати та часу в логах.
-  - `level`: Рівень логування (DEBUG, INFO, WARNING, ERROR, CRITICAL).
+```bash
+sudo docker run -it --rm -p 8000:8000 \
+    -v $(pwd)/config.ini:/app/config.ini \
+    my-soap-app
+```
+де параметр `-v $(pwd)/config.ini:/app/config.ini` монтує локальний файл конфігурації в контейнер за шляхом /app/config.ini.
 
-Приклад файлу конфігурації `config.ini`:
+**Приклад конфігураційного файлу `config.ini`**:
 
 ```ini
 [database]
-# тип бази даних (mysql, postgres тощо)
-type = mysql
-# хост бази даних
-host = 10.0.20.242
-# порт бази даних
-port = 3306
-# ім'я бази даних
-name = soap
-# ім'я користувача бази даних
-username = soap
-# пароль до бази даних
-password = 1234
+db_type = mysql
+username = myuser
+password = mypassword
+host = mydbhost
+name = mydatabase
 
 [logging]
-# файл для запису логів
-filename = /tmp/file.log
-# режим роботи з файлом логів (a - додати, w - перезаписати)
+filename = /var/log/app.log
 filemode = a
-# формат запису логів
-format = %(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s
-# формат дати і часу в логах
-dateformat = %H:%M:%S
-# рівень логування (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-level = DEBUG
+format = %(asctime)s - %(name)s - %(levelname)s - %(message)s
+dateformat = %Y-%m-%d %H:%M:%S
+level = info
 ```
 
-### 8. Встановіть віртуалне середовище та активуйте його:
+## Перегляд журналів подій
+
+Якщо виведення журналів подій налаштоване у консоль, переглядати їх можна за допомогою команди:
+
 ```bash
-python3.10 -m venv soap_sync_service
-source soap_sync_service/bin/activate
+docker logs <container_id>
 ```
 
-###  9. Встановіть залежності:
+В разі, якщо журнали подій зберігаються у файл (через змінну оточення `LOG_FILENAME` або конфігураційний файл), можна налаштувати монтування директорії з журналами подій на локальній машині наступним чином:
 ```bash
-pip install --upgrade pip
-pip install -r requirements.txt
+docker run -it --rm -p 8000:8000 \
+    -e LOG_FILENAME="/var/log/app.log" \
+    -v $(pwd)/logs:/var/log \
+    my-soap-app
 ```
 
-### 10. Створіть структуру бд за допомогою alembic:
-```bash
-alembic revision --autogenerate -m "Init migration"
-alembic upgrade head
-```
+де параметр `-v $(pwd)/logs:/var/log` монтує локальну директорію для збереження журналів подій.
 
-### 11. Створіть systemd файл:
-```bash
-sudo bash -c "cat > /etc/systemd/system/soap_sync_service_gunicorn.service" << EOL
-[Unit]
-Description=SOAP Service by Guvicorn
-After=network.target
 
-[Service]
-User=$USER
-WorkingDirectory=$PWD
-ExecStart=$PWD/$VENV_DIR/bin/gunicorn -c  gunicorn_config.py main:wsgi_application
-Restart=always
-RestartSec=3
-
-[Install]
-WantedBy=multi-user.target
-EOL
-```
-
-### 12. Перезавантажте systemd
-```bash
-sudo systemctl daemon-reload
-```
-
-### 13. Запустіть сервіс за допомогою команди:
-```bash
-sudo systemctl start soap_sync_service_gunicorn
-```
+##
+Матеріали створено за підтримки проєкту міжнародної технічної допомоги «Підтримка ЄС цифрової трансформації України (DT4UA)».
